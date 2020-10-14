@@ -48,4 +48,47 @@ router.get('/blogs', function(req, res, next) {
   });
 });
 
+router.get('/blogs/new',function(req, res){
+  res.render("blogs/new"); 
+});
+
+router.post("/blogs", function(req, res){
+  // get data from form and add to campgrounds array
+  var title = req.body.title;
+  var subtitle = req.body.subtitle;
+  var image = req.body.image;
+  var body = req.body.body;
+  // var author = {
+  //     id: req.user._id,
+  //     username: req.user.username
+  // }
+  var author = req.body.author;
+  var newBlog = {title: title, subtitle: subtitle, image: image, body: body, author:author}
+  // Create a new campground and save to DB
+  Blog.create(newBlog, function(err, newlyCreated){
+      if(err){
+          console.log(err);
+      } else {
+          //redirect back to campgrounds page
+          console.log(newlyCreated);
+          res.redirect("/blogs");
+      }
+  });
+});
+
+
+router.get('/blogs/:id',function(req,res){
+  Blog.findById(req.params.id).populate("comments").exec(function(err, blogs){
+    if(err){
+        console.log(err);
+    } else {
+        console.log("foundBlog")
+        //render show template with that campground
+        res.render("blogs/posts", {blogs: blogs});
+    }
+});
+});
+
+
+
 module.exports = router;
